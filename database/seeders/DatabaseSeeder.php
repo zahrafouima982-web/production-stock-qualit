@@ -55,9 +55,21 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Phase 2 addition: a deliberately deactivated account, for manually
+        // and automatically testing the "inactive user cannot log in" rule.
+        User::updateOrCreate(
+            ['email' => 'inactive@pqtms.test'],
+            [
+                'name' => 'Deactivated Demo User',
+                'password' => 'password',
+                'role_id' => Role::where('name', Role::STOCK_MANAGER)->value('id'),
+                'is_active' => false,
+            ]
+        );
+
         // Optional richer demo dataset (products, lines, components, a full
         // production -> quality -> stock workflow). Comment out the line below
-        // if you only want the four base users for now.
+        // if you only want the base users for now.
         $this->call([
             DemoDataSeeder::class,
         ]);
