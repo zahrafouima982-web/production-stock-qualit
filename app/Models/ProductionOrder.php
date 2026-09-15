@@ -54,4 +54,11 @@ class ProductionOrder extends Model
     {
         return $this->hasMany(ProductionRecord::class);
     }
+
+    // Phase 3 addition — single source of truth for the cancellation rule,
+    // shared by ProductionOrderPolicy and ProductionService so the two never drift apart.
+    public function isCancellable(): bool
+    {
+        return ! in_array($this->status, [self::STATUS_COMPLETED, self::STATUS_CANCELLED], true);
+    }
 }
