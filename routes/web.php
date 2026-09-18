@@ -6,6 +6,9 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductionLineController;
 use App\Http\Controllers\ProductionOrderController;
 use App\Http\Controllers\ProductionRecordController;
+use App\Http\Controllers\QualityInspectionController;
+use App\Http\Controllers\QualityDefectController;
+use App\Http\Controllers\CorrectiveActionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -72,5 +75,37 @@ Route::middleware('auth')->group(function () {
         Route::resource('orders.records', ProductionRecordController::class)
             ->except(['destroy'])
             ->shallow();
+    });
+
+    // ---- Phase 4: Quality Management ---------------------------------------
+    // Same rationale as Production: PRODUCTION_MANAGER needs read-only access
+    // and ADMIN supervises/reads only — no role: middleware here, every
+    // action is Policy-gated instead (see app/Policies/Quality*).
+
+    Route::prefix('quality')->name('quality.')->group(function () {
+        Route::resource('inspections', QualityInspectionController::class)
+            ->only(['index', 'create', 'store', 'show']);
+
+        Route::post('inspections/{inspection}/reinspect', [QualityInspectionController::class, 'reinspect'])
+            ->name('inspections.reinspect');
+
+        Route::get('inspections/{inspection}/defects/create', [QualityDefectController::class, 'create'])
+            ->name('inspections.defects.create');
+        Route::post('inspections/{inspection}/defects', [QualityDefectController::class, 'store'])
+            ->name('inspections.defects.store');
+
+        Route::get('defects/{defect}', [QualityDefectController::class, 'show'])->name('defects.show');
+
+        Route::get('defects/{defect}/corrective-action/create', [CorrectiveActionController::class, 'create'])
+            ->name('defects.corrective-action.create');
+        Route::post('defects/{defect}/corrective-action', [CorrectiveActionController::class, 'store'])
+            ->name('defects.corrective-action.store');
+
+        Route::get('corrective-actions/{correctiveAction}', [CorrectiveActionController::class, 'show'])
+            ->name('corrective-actions.show');
+        Route::put('corrective-actions/{correctiveAction}', [CorrectiveActionController::class, 'update'])
+            ->name('corrective-actions.update');
+        Route::post('corrective-actions/{correctiveAction}/validate', [CorrectiveActionController::class, 'validate'])
+            ->name('corrective-actions.validate');
     });
 });

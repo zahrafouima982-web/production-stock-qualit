@@ -22,6 +22,7 @@
                             <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Products</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('production-lines.index') }}">Production Lines</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('production.orders.index') }}">Production Orders</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('quality.inspections.index') }}">Quality Inspections</a></li>
                         @endif
 
                         @if (auth()->user()->isProductionManager())
