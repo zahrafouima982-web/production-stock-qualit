@@ -25,6 +25,15 @@
                             <li class="nav-item"><a class="nav-link" href="{{ route('quality.inspections.index') }}">Quality Inspections</a></li>
                         @endif
 
+                        @if (auth()->user()->isAdmin() || auth()->user()->isProductionManager() || auth()->user()->isStockManager())
+                            <li class="nav-item"><a class="nav-link" href="{{ route('components.index') }}">Components</a></li>
+                        @endif
+
+                        @if (auth()->user()->isAdmin() || auth()->user()->isStockManager())
+                            <li class="nav-item"><a class="nav-link" href="{{ route('stock.movements.index') }}">Stock Movements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('stock.alerts.index') }}">Stock Alerts</a></li>
+                        @endif
+
                         @if (auth()->user()->isProductionManager())
                             <li class="nav-item"><a class="nav-link" href="{{ route('production.dashboard') }}">Production Dashboard</a></li>
                         @endif
