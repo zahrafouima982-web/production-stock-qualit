@@ -9,6 +9,9 @@ use App\Http\Controllers\ProductionRecordController;
 use App\Http\Controllers\QualityInspectionController;
 use App\Http\Controllers\QualityDefectController;
 use App\Http\Controllers\CorrectiveActionController;
+use App\Http\Controllers\ComponentController;
+use App\Http\Controllers\StockMovementController;
+use App\Http\Controllers\StockAlertController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,6 +60,17 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role:STOCK_MANAGER,ADMIN')->prefix('stock')->name('stock.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'stock'])->name('dashboard');
+
+        // Phase 5: safe here (unlike Production/Quality) because neither
+        // PRODUCTION_MANAGER nor QUALITY_CONTROLLER have any access at all
+        // to movements/alerts per the permission matrix — no read-only third
+        // role to accommodate, so the blanket role: gate is sufficient.
+        Route::get('movements', [StockMovementController::class, 'index'])->name('movements.index');
+        Route::get('movements/create', [StockMovementController::class, 'create'])->name('movements.create');
+        Route::post('movements', [StockMovementController::class, 'store'])->name('movements.store');
+
+        Route::get('alerts', [StockAlertController::class, 'index'])->name('alerts.index');
+        Route::post('alerts/{alert}/resolve', [StockAlertController::class, 'resolve'])->name('alerts.resolve');
     });
 
     // ---- Phase 3: Production Management -----------------------------------
@@ -67,6 +81,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('products', ProductController::class)->except(['show']);
     Route::resource('production-lines', ProductionLineController::class)->except(['show']);
+    Route::resource('components', ComponentController::class)->except(['show']);
 
     Route::prefix('production')->name('production.')->group(function () {
         Route::resource('orders', ProductionOrderController::class)->except(['destroy']);
