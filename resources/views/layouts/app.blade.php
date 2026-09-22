@@ -18,6 +18,8 @@
                             <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
                         @endif
 
+                        <li class="nav-item"><a class="nav-link" href="{{ route('traceability.index') }}">Traceability</a></li>
+
                         @if (auth()->user()->isAdmin() || auth()->user()->isProductionManager() || auth()->user()->isQualityController())
                             <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Products</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('production-lines.index') }}">Production Lines</a></li>
