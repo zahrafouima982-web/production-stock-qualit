@@ -12,6 +12,7 @@ use App\Http\Controllers\CorrectiveActionController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\StockAlertController;
+use App\Http\Controllers\TraceabilityController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -122,5 +123,15 @@ Route::middleware('auth')->group(function () {
             ->name('corrective-actions.update');
         Route::post('corrective-actions/{correctiveAction}/validate', [CorrectiveActionController::class, 'validate'])
             ->name('corrective-actions.validate');
+    });
+
+    // ---- Phase 6: Traceability ----------------------------------------------
+    // Open to every authenticated role — the permission matrix grants "R" to
+    // all four here, and the controller is read-only, so no role: middleware
+    // and no Policy (there's no single Eloquent model this feature belongs to).
+
+    Route::prefix('traceability')->name('traceability.')->group(function () {
+        Route::get('/', [TraceabilityController::class, 'index'])->name('index');
+        Route::get('orders/{order}', [TraceabilityController::class, 'show'])->name('show');
     });
 });
