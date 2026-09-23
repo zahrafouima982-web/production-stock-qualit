@@ -85,7 +85,11 @@ class ProductionOrderController extends Controller
             'planned_quantity' => 'required|integer|min:1',
         ]);
 
-        $this->productionService->updateOrder($order, $validated, $request->user());
+        try {
+            $this->productionService->updateOrder($order, $validated, $request->user());
+        } catch (\RuntimeException $e) {
+            return back()->withInput()->withErrors(['order' => $e->getMessage()]);
+        }
 
         return redirect()->route('production.orders.show', $order)->with('status', 'Order updated.');
     }
@@ -94,7 +98,11 @@ class ProductionOrderController extends Controller
     {
         $this->authorize('cancel', $order);
 
-        $this->productionService->cancelOrder($order, $request->user());
+        try {
+            $this->productionService->cancelOrder($order, $request->user());
+        } catch (\RuntimeException $e) {
+            return back()->withErrors(['order' => $e->getMessage()]);
+        }
 
         return redirect()->route('production.orders.show', $order)->with('status', 'Order cancelled.');
     }

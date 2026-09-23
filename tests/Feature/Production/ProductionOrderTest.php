@@ -126,7 +126,36 @@ class ProductionOrderTest extends TestCase
         $order->refresh();
         $this->assertSame(ProductionOrder::STATUS_COMPLETED, $order->status);
 
-        $this->actingAs($pm)->post(route('production.orders.cancel', $order))->assertStatus(403);
+        // Was assertStatus(403) — the Policy used to also gate on order
+        // status, which blocked the Service's friendly RuntimeException
+        // message before it could ever be shown (same class of bug fixed in
+        // CorrectiveActionPolicy::validate() and StockAlertPolicy::resolve()).
+        // The Policy now only checks role; the Service owns this rule.
+        $this->actingAs($pm)->post(route('production.orders.cancel', $order))
+            ->assertSessionHasErrors('order');
+
+        $this->assertSame(ProductionOrder::STATUS_COMPLETED, $order->fresh()->status);
+    }
+
+    public function test_a_completed_order_cannot_be_updated_either(): void
+    {
+        $pm = $this->userWithRole(Role::PRODUCTION_MANAGER);
+        $order = $this->createOrder($pm, 10);
+
+        $this->actingAs($pm)->post(route('production.orders.records.store', $order), [
+            'produced_quantity' => 10,
+        ]);
+
+        $order->refresh();
+        $this->assertSame(ProductionOrder::STATUS_COMPLETED, $order->status);
+
+        $this->actingAs($pm)->put(route('production.orders.update', $order), [
+            'product_id' => $this->product->id,
+            'production_line_id' => $this->line->id,
+            'planned_quantity' => 999,
+        ])->assertSessionHasErrors('order');
+
+        $this->assertSame(10, $order->fresh()->planned_quantity, 'planned_quantity must be unchanged.');
     }
 
     public function test_a_planned_order_can_be_cancelled(): void

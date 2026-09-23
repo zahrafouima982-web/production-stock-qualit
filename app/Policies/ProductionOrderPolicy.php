@@ -29,13 +29,18 @@ class ProductionOrderPolicy
         return $user->isProductionManager();
     }
 
+    // Only role is checked here — same lesson as CorrectiveActionPolicy::validate()
+    // and StockAlertPolicy::resolve(): gating on $order->isCancellable() here
+    // would 403 before ProductionService's RuntimeException ("completed or
+    // cancelled") ever gets a chance to produce a friendly redirect-with-errors
+    // instead. The controller's update()/cancel() now catch that exception.
     public function update(User $user, ProductionOrder $order): bool
     {
-        return $user->isProductionManager() && $order->isCancellable();
+        return $user->isProductionManager();
     }
 
     public function cancel(User $user, ProductionOrder $order): bool
     {
-        return $user->isProductionManager() && $order->isCancellable();
+        return $user->isProductionManager();
     }
 }
