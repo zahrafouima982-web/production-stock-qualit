@@ -14,6 +14,16 @@
         $totalProduced = $order->productionRecords->sum('produced_quantity');
     @endphp
 
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0 ps-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
             <h2 class="fw-bold mb-1">Order {{ $order->order_number }}</h2>

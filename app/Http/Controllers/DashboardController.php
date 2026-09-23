@@ -2,31 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DashboardService;
 use Illuminate\View\View;
 
-/**
- * Placeholder dashboards only — full KPI dashboards are a later phase
- * (see architecture doc, section 15 "Dashboards").
- */
 class DashboardController extends Controller
 {
+    public function __construct(private DashboardService $dashboard)
+    {
+    }
+
     public function admin(): View
     {
-        return view('dashboard.admin');
+        return view('dashboard.admin', $this->dashboard->adminStats());
     }
 
     public function production(): View
     {
-        return view('dashboard.production');
+        return view('dashboard.production', $this->dashboard->productionStats());
     }
 
     public function quality(): View
     {
-        return view('dashboard.quality');
+        return view('dashboard.quality', $this->dashboard->qualityStats());
     }
 
     public function stock(): View
     {
-        return view('dashboard.stock');
+        return view('dashboard.stock', $this->dashboard->stockStats());
     }
 }
